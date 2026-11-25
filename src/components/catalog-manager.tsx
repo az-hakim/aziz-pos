@@ -23,7 +23,7 @@ export type CatalogRow = Record<string, string | number | boolean | null>;
 export type CatalogField = {
   key: string;
   label: string;
-  type?: "text" | "number" | "select" | "checkbox";
+  type?: "text" | "number" | "select" | "checkbox" | "password";
   options?: { value: string; label: string }[];
 };
 export type CatalogColumn = { key: string; label: string; currency?: boolean };
@@ -217,7 +217,7 @@ export function CatalogManager({
                     ) : (
                       <Input
                         id={`field-${field.key}`}
-                        type={field.type === "number" ? "number" : "text"}
+                        type={field.type === "number" || field.type === "password" ? field.type : "text"}
                         value={String(values[field.key] ?? "")}
                         onChange={(event) => setValues({ ...values, [field.key]: event.target.value })}
                       />

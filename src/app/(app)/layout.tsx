@@ -24,6 +24,13 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           orderBy: { name: "asc" },
         })
       : [];
+  const assignedBranch =
+    session.user.role === "SUPER_ADMIN"
+      ? null
+      : await db.branch.findUnique({
+          where: { id: session.user.branchId ?? 0 },
+          select: { name: true },
+        });
 
   return (
     <AppShell
@@ -37,6 +44,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         branchId: session.user.branchId,
       }}
       branches={branches}
+      assignedBranchName={assignedBranch?.name}
     >
       {children}
     </AppShell>

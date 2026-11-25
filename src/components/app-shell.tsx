@@ -52,11 +52,13 @@ export function AppShell({
   user,
   branches,
   initialBranchId,
+  assignedBranchName,
   children,
 }: {
   user: { name: string; role: Role; branchId: number | null };
   branches: { id: number; name: string }[];
   initialBranchId: BranchSelection;
+  assignedBranchName?: string;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -107,8 +109,7 @@ export function AppShell({
                 <BranchSelect branches={branches} />
               ) : (
                 <span className="rounded-md bg-slate-100 px-3 py-2 text-sm text-slate-600">
-                  {branches.find((branch) => branch.id === user.branchId)?.name ??
-                    "Assigned branch"}
+                  {assignedBranchName ?? "Assigned branch"}
                 </span>
               )}
               <div className="text-right">
@@ -135,7 +136,6 @@ function NavLink({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
     <Link
       href={item.href}
       title={item.label}
-      prefetch={item.href === "/branches" || item.href === "/users" ? false : undefined}
       className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
         active ? "bg-blue-600 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"
       }`}
