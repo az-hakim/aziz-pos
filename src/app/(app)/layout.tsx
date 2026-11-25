@@ -3,11 +3,13 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { getStoreSettings } from "@/lib/settings";
 import { AppShell } from "@/components/app-shell";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
+  const settings = await getStoreSettings();
 
   const branchCookie = (await cookies()).get("branchId")?.value;
   const selectedBranch =
@@ -45,6 +47,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       }}
       branches={branches}
       assignedBranchName={assignedBranch?.name}
+      storeName={settings.storeName}
     >
       {children}
     </AppShell>

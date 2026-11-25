@@ -35,6 +35,7 @@ export function CatalogManager({
   columns,
   fields,
   searchKeys,
+  storeName = "AZIZ POS",
 }: {
   entity: CatalogEntity;
   title: string;
@@ -42,6 +43,7 @@ export function CatalogManager({
   columns: CatalogColumn[];
   fields: CatalogField[];
   searchKeys: string[];
+  storeName?: string;
 }) {
   const router = useRouter();
   const stickerRef = useRef<HTMLDivElement>(null);
@@ -249,7 +251,7 @@ export function CatalogManager({
         <DialogContent>
           <DialogHeader><DialogTitle>Barcode sticker</DialogTitle></DialogHeader>
           <div ref={stickerRef} className="print-sticker mx-auto flex w-[38mm] flex-col items-center justify-center border border-slate-200 bg-white p-1 text-center">
-            <div className="text-[8pt] font-semibold">AZIZ POS</div>
+            <div className="text-[8pt] font-semibold">{storeName}</div>
             <div className="max-w-full truncate text-[9pt]">{String(barcodeRow?.name ?? "")}</div>
             {barcodeRow && (
               <Barcode value={String(barcodeRow.barcode)} format="CODE128" width={1} height={32} displayValue={false} />

@@ -41,8 +41,10 @@ const userSchema = z
   .object({
     name: z.string().trim().min(1),
     email: z.string().trim().email(),
+    phone: z.string().trim(),
     role: z.enum(["SUPER_ADMIN", "BRANCH_MANAGER", "CASHIER"]),
     branchId: z.coerce.number().int().nonnegative().transform((value) => (value === 0 ? null : value)),
+    isActive: z.boolean(),
     password: z.string(),
   })
   .refine((value) => !value.password || value.password.length >= 8, {
@@ -122,7 +124,10 @@ export async function saveCatalogItem(
   id: number | null,
   values: unknown,
 ): Promise<Result> {
-  await requireRole(adminOnly(entity) ? ["SUPER_ADMIN"] : ["SUPER_ADMIN", "BRANCH_MANAGER"]);
+  const user = await requireRole(adminOnly(entity) ? ["SUPER_ADMIN"] : ["SUPER_ADMIN", "BRANCH_MANAGER"]);
+  if (entity === "user" && id === Number(user.id) && (values as { isActive?: unknown }).isActive === false) {
+    return { error: "You cannot deactivate your own account." };
+  }
   try {
     await writers[entity](values, id);
   } catch (error) {

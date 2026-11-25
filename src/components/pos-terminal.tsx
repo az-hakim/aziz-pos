@@ -40,11 +40,13 @@ export function PosTerminal({
   branchName,
   cashierName,
   needsBranch,
+  store,
 }: {
   products: PosProduct[];
   branchName: string;
   cashierName: string;
   needsBranch: boolean;
+  store: { storeName: string; address: string; phone: string; receiptFooter: string };
 }) {
   const router = useRouter();
   const scanRef = useRef<HTMLInputElement>(null);
@@ -418,8 +420,11 @@ export function PosTerminal({
           {receipt && (
             <>
               <div ref={receiptRef} className="print-receipt mx-auto w-[80mm] bg-white p-2 font-mono text-[11px] leading-tight text-slate-900">
-                <div className="text-center text-sm font-bold">AZIZ POS</div>
+                <div className="text-center text-sm font-bold">{store.storeName}</div>
                 <div className="text-center">{receipt.branchName}</div>
+                {(store.address || store.phone) && (
+                  <div className="text-center">{[store.address, store.phone].filter(Boolean).join(" · ")}</div>
+                )}
                 <div className="my-2 border-t border-dashed border-slate-400" />
                 <div>Invoice: {receipt.invoiceNumber}</div>
                 <div>Date: {dateTime(receipt.createdAt)}</div>
@@ -452,7 +457,7 @@ export function PosTerminal({
                 <div className="flex justify-center">
                   <Barcode value={receipt.invoiceNumber} format="CODE128" width={1} height={30} displayValue />
                 </div>
-                <div className="mt-2 text-center">Thank you for shopping with us!</div>
+                <div className="mt-2 text-center">{store.receiptFooter}</div>
               </div>
               <Button onClick={() => handlePrint()}>Print Receipt</Button>
             </>

@@ -1,11 +1,13 @@
 import { requireRole } from "@/lib/authz";
 import { getBranchFilter } from "@/lib/branch";
 import { db } from "@/lib/db";
+import { getStoreSettings } from "@/lib/settings";
 import { PosTerminal, type PosProduct } from "@/components/pos-terminal";
 
 export default async function PosPage() {
   const user = await requireRole(["SUPER_ADMIN", "BRANCH_MANAGER", "CASHIER"]);
   const branchId = await getBranchFilter(user);
+  const settings = await getStoreSettings();
 
   const [branch, products] = branchId === undefined
     ? [null, []]
@@ -43,6 +45,7 @@ export default async function PosPage() {
         branchName={branch?.name ?? "No branch selected"}
         cashierName={user.name ?? "Cashier"}
         needsBranch={branchId === undefined}
+        store={settings}
       />
     </div>
   );

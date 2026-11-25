@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/authz";
 import { getBranchFilter } from "@/lib/branch";
 import { db } from "@/lib/db";
 import { dateTime, money, round2 } from "@/lib/format";
+import { getStoreSettings } from "@/lib/settings";
 import { Button } from "@/components/ui/button";
 import { PrintButton } from "@/components/print-button";
 
@@ -19,6 +20,7 @@ function inputDate(date: Date): string {
 
 export default async function SalesSummaryPage({ searchParams }: { searchParams: Promise<Params> }) {
   const user = await requireRole(["SUPER_ADMIN", "BRANCH_MANAGER", "CASHIER"]);
+  const settings = await getStoreSettings();
   const params = await searchParams;
   const get = (key: string) => (typeof params[key] === "string" ? (params[key] as string) : "");
   const isCashier = user.role === "CASHIER";
@@ -107,8 +109,11 @@ export default async function SalesSummaryPage({ searchParams }: { searchParams:
 
       <div className="rounded-lg border border-slate-200 bg-white p-6 print:border-0 print:p-0">
         <header className="mb-6 text-center">
-          <h2 className="text-xl font-bold tracking-wide text-slate-900">AZIZ POS</h2>
+          <h2 className="text-xl font-bold tracking-wide text-slate-900">{settings.storeName}</h2>
           <p className="text-sm font-medium text-slate-700">{branchTitle}</p>
+          {(settings.address || settings.phone || settings.email) && (
+            <p className="text-xs text-slate-500">{[settings.address, settings.phone, settings.email].filter(Boolean).join(" · ")}</p>
+          )}
           <p className="text-xs text-slate-500">
             Sales Summary · {inputDate(from)} to {inputDate(to)} · {isCashier ? `Cashier: ${user.name}` : "All cashiers"}
           </p>

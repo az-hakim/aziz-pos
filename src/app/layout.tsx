@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { getStoreSettings } from "@/lib/settings";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,10 +13,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Aziz POS",
-  description: "Multi-branch retail POS and inventory system",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getStoreSettings();
+  return { title: settings.storeName, description: settings.tagline };
+}
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

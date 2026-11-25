@@ -21,7 +21,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!parsed.success) return null;
 
         const user = await db.user.findUnique({ where: { email: parsed.data.email } });
-        if (!user || !verifyPassword(parsed.data.password, user.passwordHash)) return null;
+        if (!user?.isActive || !verifyPassword(parsed.data.password, user.passwordHash)) return null;
 
         return {
           id: String(user.id),

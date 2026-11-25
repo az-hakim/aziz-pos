@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/authz";
 import { db } from "@/lib/db";
+import { getStoreSettings } from "@/lib/settings";
 import { CatalogManager, type CatalogColumn, type CatalogField } from "@/components/catalog-manager";
 
 const columns: CatalogColumn[] = [
@@ -17,6 +18,7 @@ const columns: CatalogColumn[] = [
 
 export default async function ProductsPage() {
   await requireRole(["SUPER_ADMIN", "BRANCH_MANAGER"]);
+  const settings = await getStoreSettings();
   const [products, categories, brands, units] = await Promise.all([
     db.product.findMany({ orderBy: { name: "asc" } }),
     db.category.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
@@ -65,6 +67,7 @@ export default async function ProductsPage() {
       columns={columns}
       fields={fields}
       searchKeys={["name", "sku", "barcode"]}
+      storeName={settings.storeName}
     />
   );
 }

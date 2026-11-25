@@ -95,7 +95,13 @@ async function main() {
     });
   }
 
-  console.log(`Seeded ${branches.length} branches, ${users.length} users, ${categories.length} categories, ${brands.length} brands, ${units.length} units, ${products.length} products.`);
+  await db.storeSettings.upsert({
+    where: { id: 1 },
+    update: {},
+    create: { id: 1 },
+  });
+
+  console.log(`Seeded ${branches.length} branches, ${users.length} users, ${categories.length} categories, ${brands.length} brands, ${units.length} units, ${products.length} products and store settings.`);
 }
 
 main()

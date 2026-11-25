@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   Menu,
   Package,
+  Settings as SettingsIcon,
   ShoppingCart,
   Tags,
   Users,
@@ -42,7 +43,8 @@ const navigation: NavItem[] = [
   { label: "Stock In", href: "/inventory/check-in", icon: ArrowDownCircle, roles: ["SUPER_ADMIN", "BRANCH_MANAGER"], group: "Inventory" },
   { label: "Stock Out", href: "/inventory/check-out", icon: ArrowUpCircle, roles: ["SUPER_ADMIN", "BRANCH_MANAGER"], group: "Inventory" },
   { label: "Branches", href: "/branches", icon: Building2, roles: ["SUPER_ADMIN"] },
-  { label: "Users", href: "/users", icon: Users, roles: ["SUPER_ADMIN"] },
+  { label: "Employees", href: "/users", icon: Users, roles: ["SUPER_ADMIN"] },
+  { label: "Store Settings", href: "/settings", icon: SettingsIcon, roles: ["SUPER_ADMIN"] },
   { label: "Sales Summary", href: "/reports/sales-summary", icon: BarChart3, roles: ["SUPER_ADMIN", "BRANCH_MANAGER"], group: "Reports" },
   { label: "Stock Movement", href: "/reports/stock-movement", icon: FileText, roles: ["SUPER_ADMIN", "BRANCH_MANAGER"], group: "Reports" },
   { label: "My Shift Sales", href: "/reports/sales-summary", icon: BarChart3, roles: ["CASHIER"], group: "Reports" },
@@ -53,12 +55,14 @@ export function AppShell({
   branches,
   initialBranchId,
   assignedBranchName,
+  storeName,
   children,
 }: {
   user: { name: string; role: Role; branchId: number | null };
   branches: { id: number; name: string }[];
   initialBranchId: BranchSelection;
   assignedBranchName?: string;
+  storeName: string;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -72,7 +76,7 @@ export function AppShell({
         >
           <div className="flex h-16 items-center gap-3 border-b border-slate-800 px-4">
             <span className="text-sm font-bold tracking-widest text-white">
-              {collapsed ? "AZ" : "AZIZ POS"}
+              {collapsed ? storeName.slice(0, 2).toUpperCase() : storeName}
             </span>
           </div>
 

@@ -55,12 +55,25 @@ model User {
   id             Int             @id @default(autoincrement())
   name           String
   email          String          @unique
+  phone          String?
   passwordHash   String
   role           Role            @default(CASHIER)
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
   branch         Branch?         @relation(fields: [branchId], references: [id])
   branchId       Int?
   stockMovements StockMovement[]
   sales          Sale[]          @relation("SaleCashier")
+}
+
+model StoreSettings {
+  id            Int    @id @default(1)
+  storeName     String @default("AZIZ POS")
+  tagline       String @default("Run every branch from one counter.")
+  address       String @default("")
+  phone         String @default("")
+  email         String @default("")
+  receiptFooter String @default("Thank you for shopping with us!")
 }
 
 model Category {
