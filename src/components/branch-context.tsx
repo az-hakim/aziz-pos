@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 
 export type BranchSelection = number | "all";
 
@@ -17,8 +18,18 @@ export function BranchProvider({
   children: ReactNode;
 }) {
   const [branchId, setBranchIdState] = useState(initialBranchId);
+  const router = useRouter();
+  const firstRender = useRef(true);
 
   // Server components read this cookie when they need the active branch.
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    router.refresh();
+  }, [branchId, router]);
+
   function setBranchId(value: BranchSelection) {
     setBranchIdState(value);
     document.cookie = `branchId=${value}; path=/; SameSite=Lax`;

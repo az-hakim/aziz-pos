@@ -129,12 +129,42 @@
   }
 }
 
+.print-receipt {
+  width: 80mm;
+  max-width: 80mm;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 @media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+  main {
+    padding: 0 !important;
+  }
   .print-sticker {
     width: 38mm;
     min-height: 25mm;
     border: 0 !important;
     padding: 1mm !important;
     font-family: ui-monospace, monospace;
+  }
+  .print-ledger {
+    font-size: 10pt;
+  }
+  .print-ledger thead {
+    display: table-header-group;
+  }
+  .print-ledger tr,
+  .print-ledger th,
+  .print-ledger td {
+    break-inside: avoid;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
   }
 }

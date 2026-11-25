@@ -66,7 +66,7 @@ export function AppShell({
     <BranchProvider initialBranchId={initialBranchId}>
       <div className="flex min-h-screen bg-slate-50">
         <aside
-          className={`${collapsed ? "w-16" : "w-64"} flex shrink-0 flex-col bg-slate-900 text-slate-200 transition-all`}
+          className={`no-print ${collapsed ? "w-16" : "w-64"} flex shrink-0 flex-col bg-slate-900 text-slate-200 transition-all`}
         >
           <div className="flex h-16 items-center gap-3 border-b border-slate-800 px-4">
             <span className="text-sm font-bold tracking-widest text-white">
@@ -92,7 +92,7 @@ export function AppShell({
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
+          <header className="no-print flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
             <button
               type="button"
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -135,7 +135,7 @@ function NavLink({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
     <Link
       href={item.href}
       title={item.label}
-      prefetch={false}
+      prefetch={item.href === "/branches" || item.href === "/users" ? false : undefined}
       className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
         active ? "bg-blue-600 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"
       }`}

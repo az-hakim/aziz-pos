@@ -1,7 +1,7 @@
 # Aziz POS — agent notes
 
 ## Read first, then implement
-- Source of truth: `agent.md` (schema + 5 phases), `design.md` (visual/print rules), `rules.md` (binding constraints), `tasks.md` (build checklist). Steps 1–5 of `tasks.md` are done: scaffold, schema/seed, `/login` + sessions, app shell, catalog CRUD + barcode. Steps 6–9 (inventory, POS, dashboard, reports) are not started.
+- Source of truth: `agent.md` (schema + 5 phases), `design.md` (visual/print rules), `rules.md` (binding constraints), `tasks.md` (build checklist). All 9 steps are implemented: scaffold, schema/seed, auth, app shell, catalog + barcode, inventory, POS, dashboard, reports.
 - Read all four before writing code. Implement `tasks.md` steps in order (1 → 9) and check them off as you go. Strip `[cite: 1]` markers; they are source-document artifacts, not product text.
 
 ## Constraints that are easy to violate
@@ -26,5 +26,9 @@
 - `next.config.ts` sets `agentRules: false` so Next 16 does not overwrite this curated AGENTS.md with its generated one. Cache Components was disabled: `auth()` reads cookies and cannot prerender under `cacheComponents: true` without Suspense boundaries.
 - Authenticated pages live in the `src/app/(app)/` route group; its layout calls `auth()`, loads branches only for `SUPER_ADMIN`, and renders `AppShell`. `/login` stays outside the group.
 - Branch selection is client state in `src/components/branch-context.tsx`, mirrored to a `branchId` cookie for future server components. Non-super-admins get no selector and are shown their assigned branch.
-- Sidebar items are filtered by role in `src/components/app-shell.tsx`; this is navigation UX only. Server-side role checks live in `src/lib/authz.ts` (`requireRole`) — catalog pages call it; each new page in Steps 6–9 must do the same. Links use `prefetch={false}` because Steps 6–9 routes do not exist yet and prefetching them logs 404s; re-enable once those pages land.
+- Sidebar items are filtered by role in `src/components/app-shell.tsx`; this is navigation UX only. Server-side role checks live in `src/lib/authz.ts` (`requireRole`) and every page/action calls it. Links prefetch normally except `/branches` and `/users`, which are still unimplemented.
+- Branch scoping: `src/lib/branch.ts` `getBranchFilter(user)` reads the `branchId` cookie for super admins and pins other roles to their assigned branch; undefined means all branches. `BranchProvider` calls `router.refresh()` on branch changes so server components see the new cookie. POS needs a concrete branch — "All Branches" blocks checkout.
+- Stock integrity: `src/lib/stock.ts` `applyStockChange(tx, ...)` is the single mutation path used by check-in, check-out and POS checkout. It runs inside `db.$transaction`, uses a conditional decrement to block overselling, and writes the `StockMovement` in the same transaction. Branch has no `allowNegativeStock` column, so overselling is always blocked.
+- POS: prices are snapshotted from the DB inside the checkout transaction; the client never sends prices or branch IDs. `Pay Order` and payment confirmation stay disabled while the transaction is pending. Receipts use `react-to-print` with an 80mm `@page` style; auto-print is opt-in.
+- Reports: A4 ledger print styles live in `globals.css` (`.print-ledger`, `.no-print`, repeating `thead`). Cashiers only see today's sales for their own `cashierId`; managers are pinned to their assigned branch.
 - Catalog: one shared client `src/components/catalog-manager.tsx` drives all four pages; server actions in `src/app/(app)/catalog/actions.ts` Zod-validate and revalidate the route. Prisma `Decimal` must be converted with `.toNumber()` before passing rows to the client component. `react-barcode` is a default import; sticker print size comes from `useReactToPrint`'s `pageStyle` plus the `.print-sticker` rule in `globals.css`.
