@@ -29,6 +29,7 @@ export default async function CheckInPage() {
       products={products}
       fixedBranchId={isAdmin ? undefined : (user.branchId ?? undefined)}
       fixedBranchName={assignedBranch?.name}
+      defaultBranchId={branchId}
       key={branchId ?? "all"}
     />
   );

@@ -28,15 +28,19 @@ export function StockForm({
   products,
   fixedBranchId,
   fixedBranchName,
+  defaultBranchId,
 }: {
   type: "IN" | "OUT";
   branches: { id: number; name: string }[];
   products: { id: number; name: string; sku: string }[];
   fixedBranchId?: number;
   fixedBranchName?: string;
+  defaultBranchId?: number;
 }) {
   const router = useRouter();
-  const [branchId, setBranchId] = useState(String(fixedBranchId ?? branches[0]?.id ?? ""));
+  const [branchId, setBranchId] = useState(
+    String(defaultBranchId ?? fixedBranchId ?? branches[0]?.id ?? ""),
+  );
   const [productId, setProductId] = useState("");
   const [reason, setReason] = useState(reasons[type][0].value);
   const [quantity, setQuantity] = useState("");

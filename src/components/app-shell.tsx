@@ -51,15 +51,15 @@ const navigation: NavItem[] = [
 export function AppShell({
   user,
   branches,
+  initialBranchId,
   children,
 }: {
   user: { name: string; role: Role; branchId: number | null };
   branches: { id: number; name: string }[];
+  initialBranchId: BranchSelection;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
-  const initialBranchId: BranchSelection =
-    user.role === "SUPER_ADMIN" ? "all" : (user.branchId ?? "all");
   const visibleItems = navigation.filter((item) => item.roles.includes(user.role));
 
   return (
