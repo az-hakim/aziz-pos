@@ -7,6 +7,7 @@ export function money(value: number): string {
 
 export function dateTime(value: Date | string): string {
   return new Date(value).toLocaleString("en-GB", {
+    timeZone: "Asia/Dhaka",
     day: "2-digit",
     month: "short",
     year: "numeric",
