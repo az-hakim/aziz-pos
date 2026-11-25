@@ -1,0 +1,38 @@
+"use client";
+
+import { createContext, useContext, useState, type ReactNode } from "react";
+
+export type BranchSelection = number | "all";
+
+const BranchContext = createContext<{
+  branchId: BranchSelection;
+  setBranchId: (branchId: BranchSelection) => void;
+} | null>(null);
+
+export function BranchProvider({
+  initialBranchId,
+  children,
+}: {
+  initialBranchId: BranchSelection;
+  children: ReactNode;
+}) {
+  const [branchId, setBranchIdState] = useState(initialBranchId);
+
+  // Server components read this cookie when they need the active branch.
+  function setBranchId(value: BranchSelection) {
+    setBranchIdState(value);
+    document.cookie = `branchId=${value}; path=/; SameSite=Lax`;
+  }
+
+  return (
+    <BranchContext.Provider value={{ branchId, setBranchId }}>
+      {children}
+    </BranchContext.Provider>
+  );
+}
+
+export function useBranch() {
+  const context = useContext(BranchContext);
+  if (!context) throw new Error("useBranch must be used inside BranchProvider");
+  return context;
+}

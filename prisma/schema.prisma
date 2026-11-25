@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  BRANCH_MANAGER
+  CASHIER
+}
+
+enum StockMovementType {
+  IN
+  OUT
+}
+
+enum StockMovementReason {
+  OPENING_STOCK
+  PURCHASE
+  TRANSFER_IN
+  SALE_RETURN
+  SALE
+  PURCHASE_RETURN
+  DAMAGE
+  EXPIRED
+  TRANSFER_OUT
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  MOBILE_BANKING
+}
+
+model Branch {
+  id        Int      @id @default(autoincrement())
+  name      String
+  code      String   @unique
+  address   String?
+  phone     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  users          User[]
+  inventory      BranchInventory[]
+  stockMovements StockMovement[]
+  sales          Sale[]
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  name           String
+  email          String          @unique
+  passwordHash   String
+  role           Role            @default(CASHIER)
+  branch         Branch?         @relation(fields: [branchId], references: [id])
+  branchId       Int?
+  stockMovements StockMovement[]
+  sales          Sale[]          @relation("SaleCashier")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
+model Brand {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+}
+
+model Unit {
+  id        Int       @id @default(autoincrement())
+  name      String
+  shortName String
+  products  Product[]
+}
+
+model Product {
+  id            Int      @id @default(autoincrement())
+  name          String
+  sku           String   @unique
+  barcode       String   @unique
+  category      Category @relation(fields: [categoryId], references: [id])
+  categoryId    Int
+  brand         Brand    @relation(fields: [brandId], references: [id])
+  brandId       Int
+  unit          Unit     @relation(fields: [unitId], references: [id])
+  unitId        Int
+  costPrice     Decimal  @db.Decimal(12, 2)
+  sellingPrice  Decimal  @db.Decimal(12, 2)
+  lowStockAlert Int      @default(0)
+  isActive      Boolean  @default(true)
+
+  inventory      BranchInventory[]
+  stockMovements StockMovement[]
+  saleItems      SaleItem[]
+}
+
+model BranchInventory {
+  id        Int     @id @default(autoincrement())
+  branch    Branch  @relation(fields: [branchId], references: [id])
+  branchId  Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int     @default(0)
+
+  @@unique([branchId, productId])
+}
+
+model StockMovement {
+  id             Int                 @id @default(autoincrement())
+  branch         Branch              @relation(fields: [branchId], references: [id])
+  branchId       Int
+  product        Product             @relation(fields: [productId], references: [id])
+  productId      Int
+  user           User                @relation(fields: [userId], references: [id])
+  userId         Int
+  type           StockMovementType
+  reason         StockMovementReason
+  quantityChange Int
+  previousQty    Int
+  newQty         Int
+  referenceNote  String?
+  createdAt      DateTime            @default(now())
+
+  @@index([branchId, createdAt])
+}
+
+model Sale {
+  id             Int           @id @default(autoincrement())
+  invoiceNumber  String        @unique
+  branch         Branch        @relation(fields: [branchId], references: [id])
+  branchId       Int
+  cashier        User          @relation("SaleCashier", fields: [cashierId], references: [id])
+  cashierId      Int
+  subtotal       Decimal       @db.Decimal(12, 2)
+  discountAmount Decimal       @default(0) @db.Decimal(12, 2)
+  taxAmount      Decimal       @default(0) @db.Decimal(12, 2)
+  grandTotal     Decimal       @db.Decimal(12, 2)
+  paymentMethod  PaymentMethod
+  amountPaid     Decimal       @db.Decimal(12, 2)
+  changeReturned Decimal       @default(0) @db.Decimal(12, 2)
+  createdAt      DateTime      @default(now())
+
+  items SaleItem[]
+
+  @@index([branchId, createdAt])
+}
+
+model SaleItem {
+  id         Int     @id @default(autoincrement())
+  sale       Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleId     Int
+  product    Product @relation(fields: [productId], references: [id])
+  productId  Int
+  quantity   Int
+  unitPrice  Decimal @db.Decimal(12, 2)
+  totalPrice Decimal @db.Decimal(12, 2)
+}
