@@ -135,6 +135,7 @@ function NavLink({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
     <Link
       href={item.href}
       title={item.label}
+      prefetch={false}
       className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
         active ? "bg-blue-600 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"
       }`}
