@@ -14,6 +14,10 @@
 - Next.js App Router + TypeScript, Tailwind + shadcn/ui, PostgreSQL via Prisma 6, Auth.js v5 beta (`next-auth@beta`) credentials + JWT sessions carrying `role` and `branchId`. Prisma 8 RC was rejected: its contract API does not match the `db.$transaction` rule. Use the exact model and enum names in `agent.md` §3.
 - Barcode `react-barcode`, printing `react-to-print`. Currency `৳` with 2 decimals and `tabular-nums`; print targets are the 80mm receipt, 38×25mm sticker, and A4 ledger in `design.md`.
 
+## Deployed
+- Live app: `https://aziz-pos.vercel.app` (Vercel project `aziz-pos`, team `tlessnoobs-projects`). GitHub: `az-hakim/aziz-pos` on `master`.
+- Database: Neon branch `aziz-pos` (`br-soft-credit-au6r3xxv`) in project `young-thunder-17742241`; the branch was reset once because it inherited another app's schema from its parent. `DATABASE_URL` and `AUTH_SECRET` are Vercel secrets, not in git.
+
 ## Verify
 - Run `npm run build` before `npm run typecheck`: Next 16 generates the `LayoutProps` route types during build, so a fresh clone fails `tsc` alone.
 - `npm run lint`; `npx prisma validate`; `npm run db:generate` after schema edits. `npm run db:migrate` and `npm run db:seed` need a live `DATABASE_URL` (copy `.env.example` to `.env`). Seed is idempotent and resets all three demo accounts to password `admin123` on every run.
